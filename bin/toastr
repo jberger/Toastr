@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use Mojo::Base -strict;
+use Toastr;
+
+my @chans = (
+  #'#mojo',
+  '#galileo',
+);
+
+my $toastr = Toastr->new(
+  nick   => 'toastr',
+  user   => 'toastr bot',
+  server => 'irc.perl.org:6667', 
+);
+
+$toastr->plugin('KarmaHandler');
+$toastr->start(\@chans);
+
