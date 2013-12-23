@@ -40,7 +40,6 @@ sub _privmsg {
   my ($irc, $msg) = @_;
   my ($chan, $text) = @{ $msg->{params} };
 
-  my $nick_ptn = $irc->nick_ptn;
   my $nick = $irc->nick;
   my $is_pm = 0;
 
@@ -49,27 +48,15 @@ sub _privmsg {
     $is_pm = 1;
   }
 
-  if ($text =~ /$nick_ptn\+\+/) {
-    $irc->emit( toastr_karma_up => $1, $chan, $msg );
-  }
-
-  if ($text =~ /$nick_ptn\-\-/) {
-    $irc->emit( toastr_karma_down => $1, $chan, $msg );
-  }
+  $irc->emit( toastr_privmsg => $chan, $text, $is_pm, $msg );
 
   if ($text =~ s/^\Q$nick\E\S*\s*// or $is_pm) {
-    if ($text =~ /karma\s+$nick_ptn/) {
-      $irc->emit( toastr_karma_query => $1, $chan, $msg );
-      # karma queries do not trigger direct message event
-      return if $irc->has_subscribers('toastr_karma_query'); 
-    }
-    $irc->emit( toastr_direct_message => $text, $chan, $msg );
+    $irc->emit( toastr_direct_message => $chan, $text, $is_pm, $msg );
   }
 
   if ($text =~ /toast/) {
     $irc->emit( toastr_toast => $text, $chan, $msg );
   }
-
 }
 
 1;

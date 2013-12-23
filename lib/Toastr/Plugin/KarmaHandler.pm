@@ -20,18 +20,38 @@ sub leaderboard {
 
 sub register {
   my ($self, $irc) = @_;
+  my $nick_ptn = $irc->nick_ptn;
 
-  $irc->on( toastr_karma_up => sub {
+  $irc->on( toastr_privmsg => sub {
+    my ($irc, $chan, $text, $is_pm, $msg) = @_;
+
+    if ($text =~ /$nick_ptn\+\+/) {
+      $irc->emit( karma_handler_up => $1, $chan, $msg );
+    }
+
+    if ($text =~ /$nick_ptn\-\-/) {
+      $irc->emit( karma_handler_down => $1, $chan, $msg );
+    }
+  });
+
+  $irc->on( toastr_direct_message => sub {
+    my ($irc, $chan, $text, $is_pm, $msg) = @_;
+    if ($text =~ /karma\s+$nick_ptn/) {
+      $irc->emit( karma_handler_query => $1, $chan, $msg );
+    }
+  });
+
+  $irc->on( karma_handler_up => sub {
     my ($irc, $user, $chan, $msg) = @_;
     $irc->karma_handler->karma->{$user}++;
   });
 
-  $irc->on( toastr_karma_down => sub {
+  $irc->on( karma_handler_down => sub {
     my ($irc, $user, $chan, $msg) = @_;
     $irc->karma_handler->karma->{$user}--;
   });
 
-  $irc->on( toastr_karma_query => sub {
+  $irc->on( karma_handler_query => sub {
     my ($irc, $user, $chan, $msg) = @_;
     my $handler = $irc->karma_handler;
     if ($user eq '__leaders__' && $chan !~ /^#/) { # no __leaders__ in room
