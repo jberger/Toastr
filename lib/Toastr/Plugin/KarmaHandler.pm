@@ -26,33 +26,33 @@ sub register {
     my ($irc, $chan, $text, $is_pm, $msg) = @_;
 
     if ($text =~ /$nick_ptn\+\+/) {
-      $irc->emit( karma_handler_up => $1, $chan, $msg );
+      $irc->emit( karma_handler_up => $chan, $1, $msg );
     }
 
     if ($text =~ /$nick_ptn\-\-/) {
-      $irc->emit( karma_handler_down => $1, $chan, $msg );
+      $irc->emit( karma_handler_down => $chan, $1, $msg );
     }
   });
 
   $irc->on( toastr_direct_message => sub {
     my ($irc, $chan, $text, $is_pm, $msg) = @_;
     if ($text =~ /karma\s+$nick_ptn/) {
-      $irc->emit( karma_handler_query => $1, $chan, $msg );
+      $irc->emit( karma_handler_query => $chan, $1, $msg );
     }
   });
 
   $irc->on( karma_handler_up => sub {
-    my ($irc, $user, $chan, $msg) = @_;
+    my ($irc, $chan, $user, $msg) = @_;
     $irc->karma_handler->karma->{$user}++;
   });
 
   $irc->on( karma_handler_down => sub {
-    my ($irc, $user, $chan, $msg) = @_;
+    my ($irc, $chan, $user, $msg) = @_;
     $irc->karma_handler->karma->{$user}--;
   });
 
   $irc->on( karma_handler_query => sub {
-    my ($irc, $user, $chan, $msg) = @_;
+    my ($irc, $chan, $user, $msg) = @_;
     my $handler = $irc->karma_handler;
     if ($user eq '__leaders__' && $chan !~ /^#/) { # no __leaders__ in room
       my $leaders = $handler->leaderboard;

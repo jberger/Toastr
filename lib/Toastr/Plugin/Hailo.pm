@@ -12,7 +12,7 @@ sub register {
   my $self = shift;
 
   $self->irc->on( toastr_direct_message => sub {
-    my ($irc, $text, $chan, $msg) = @_;
+    my ($irc, $chan, $text, $msg) = @_;
     if ($text =~ /\?/) {
       my $reply = $irc->hailo->hal->reply($text);
       $irc->msg( $chan => $reply ) if $reply;

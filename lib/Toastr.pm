@@ -55,7 +55,7 @@ sub _privmsg {
   }
 
   if ($text =~ /toast/) {
-    $irc->emit( toastr_toast => $text, $chan, $msg );
+    $irc->emit( toastr_toast => $chan, $text, $msg );
   }
 }
 
