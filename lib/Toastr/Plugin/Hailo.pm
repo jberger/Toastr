@@ -6,18 +6,25 @@ BEGIN { $ENV{ANY_MOOSE} = 'Moose' }
 use Hailo;
 
 has brain => 'toastr.db';
-has hal => sub { Hailo->new( brain => shift->brain ) };
+has hal => sub {  Hailo->new( brain => shift->brain )};
 
 sub register {
   my $self = shift;
 
-  $self->irc->on( toastr_direct_message => sub {
-    my ($irc, $text, $chan, $msg) = @_;
+  my $irc=shift;
+  
+  $irc->on(toastr_privmsg => sub{
+    my ($irc, $where, $text, $is_msg) = @_;
+      $irc->hailo->hal->learn($text); #learn also if not directly called
+    });
+
+  $irc->on( toastr_direct_message => sub {
+    my ($irc, $where, $text, $is_msg) = @_;
     if ($text =~ /\?/) {
-      my $reply = $irc->hailo->hal->reply($text);
-      $irc->msg( $chan => $reply ) if $reply;
-    } elsif ($text =~ s/^\+//) {
-      $irc->hailo->hal->learn($text);
+      my $reply = $irc->hailo->hal->learn_reply($text); #learn and reply
+      $irc->msg( $where => $reply ) if $reply;
+    } else {
+      $irc->hailo->hal->learn($text); #otherwise will learn
     }
   });
 }
