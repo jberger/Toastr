@@ -3,9 +3,9 @@ package Toastr::Message;
 use Mojo::Base -base;
 
 has [qw/chan msg/];
-has text => '';
-has is_pm => 0;
+has [qw/is_pm is_direct/] => 0;
 has handled_by => sub { [] };
+has text => '';
 
 sub handled { 
   my $self = shift;

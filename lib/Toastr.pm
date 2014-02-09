@@ -49,19 +49,22 @@ sub _privmsg {
     $is_pm = 1;
   }
 
+  my $is_direct = 0;
+  if ($text =~ s/^\Q$nick\E\S*\s*// or $is_pm) {
+    $is_direct = 1;
+  }
+
   my $message = Toastr::Message->new(
-    chan  => $chan,
-    text  => $text,
-    is_pm => $is_pm,
-    msg   => $msg,
+    chan      => $chan,
+    text      => $text,
+    is_pm     => $is_pm,
+    is_direct => $is_direct,
+    msg       => $msg,
   );
 
   $irc->emit( toastr_privmsg => $message );
 
-  if ($text =~ s/^\Q$nick\E\S*\s*// or $is_pm) {
-    my $dm = Toastr::Message->new( %$message, text => $text );
-    $irc->emit( toastr_direct_message => $dm );
-  }
+  $irc->emit( toastr_direct_message => $message ) if $is_direct;
 
   if ($text =~ /toast/) {
     $irc->emit( toastr_toast => $message );
