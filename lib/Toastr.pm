@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::IRC';
 
 use IRC::Utils ();
 use Mojo::Util 'decamelize';
+use Toastr::Message;
 
 has nick_ptn => sub { qr/\b([a-z_\-\[\]\\^{}|`]+)\b/i };
 
@@ -48,16 +49,22 @@ sub _privmsg {
     $is_pm = 1;
   }
 
-  my $handled = [];
+  my $message = Toastr::Message->new(
+    chan  => $chan,
+    text  => $text,
+    is_pm => $is_pm,
+    msg   => $msg,
+  );
 
-  $irc->emit( toastr_privmsg => $chan, $text, $is_pm, $handled, $msg );
+  $irc->emit( toastr_privmsg => $message );
 
   if ($text =~ s/^\Q$nick\E\S*\s*// or $is_pm) {
-    $irc->emit( toastr_direct_message => $chan, $text, $is_pm, $handled, $msg );
+    my $dm = Toastr::Message->new( %$message, text => $text );
+    $irc->emit( toastr_direct_message => $dm );
   }
 
   if ($text =~ /toast/) {
-    $irc->emit( toastr_toast => $chan, $text, $handled, $msg );
+    $irc->emit( toastr_toast => $message );
   }
 }
 

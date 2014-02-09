@@ -7,27 +7,27 @@ use Hailo;
 
 has brain => 'toastr.db';
 has hal   => sub { Hailo->new( brain => shift->brain ) };
-has reply => sub { sub { $_[2] } };
-has learn => sub { sub { $_[2] } };
+has reply => sub { sub { $_[1] } };
+has learn => sub { sub { $_[1] } };
 
 sub register {
   my ($self, $irc) = @_;
 
   $irc->on( toastr_privmsg => sub {
-    my ($irc, $chan, $text, $is_pm, $handled, $msg) = @_;
+    my ($irc, $msg) = @_;
     my $learn = $self->learn;
-    my $l = $self->$learn($chan, $text, $msg);
+    my $l = $self->$learn($msg->text, $msg);
     return unless defined $l;
     $self->hal->learn($l);
   });
 
   $irc->on( toastr_direct_message => sub {
-    my ($irc, $chan, $text, $is_pm, $handled, $msg) = @_;
+    my ($irc, $msg) = @_;
     my $reply = $self->reply;
-    my $r = $self->$reply($chan, $text, $msg);
+    my $r = $self->$reply($msg->text, $msg);
     return unless defined $r;
     my $response = $self->hal->reply($r);
-    $irc->msg( $chan => $response ) if $response;
+    $irc->msg( $msg->chan => $response ) if $response;
   });
 }
 
