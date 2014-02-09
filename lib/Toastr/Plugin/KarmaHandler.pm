@@ -23,7 +23,7 @@ sub register {
   my $nick_ptn = $irc->nick_ptn;
   my $name = 'KarmaHandler';
 
-  $irc->on( toastr_privmsg => sub {
+  $irc->on( toastr_message => sub {
     my ($irc, $msg) = @_;
     my $text = $msg->text;
 

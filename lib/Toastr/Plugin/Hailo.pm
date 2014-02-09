@@ -13,7 +13,7 @@ has learn => sub { sub { $_[1] } };
 sub register {
   my ($self, $irc) = @_;
 
-  $irc->on( toastr_privmsg => sub {
+  $irc->on( toastr_message => sub {
     my ($irc, $msg) = @_;
     return if $msg->handled; # don't reply on a previously handled message
 

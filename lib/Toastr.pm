@@ -62,7 +62,7 @@ sub _privmsg {
     msg       => $msg,
   );
 
-  $irc->emit( toastr_privmsg => $message );
+  $irc->emit( toastr_message => $message );
 
   $irc->emit( toastr_direct_message => $message ) if $is_direct;
 
