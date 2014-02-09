@@ -4,8 +4,7 @@ use Mojo::Base -strict;
 use Toastr;
 
 my @chans = (
-  #'#mojo',
-  '#galileo',
+  '#toastr'
 );
 
 my $toastr = Toastr->new(
@@ -15,5 +14,7 @@ my $toastr = Toastr->new(
 );
 
 $toastr->plugin('KarmaHandler');
+$toastr->plugin('Toast');
+$toastr->plugin('Hailo');
 $toastr->start(\@chans);
 
