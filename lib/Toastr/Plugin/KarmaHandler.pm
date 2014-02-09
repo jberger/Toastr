@@ -21,6 +21,7 @@ sub leaderboard {
 sub register {
   my ($self, $irc) = @_;
   my $nick_ptn = $irc->nick_ptn;
+  my $name = 'KarmaHandler';
 
   $irc->on( toastr_privmsg => sub {
     my ($irc, $msg) = @_;
@@ -28,10 +29,12 @@ sub register {
 
     if ($text =~ /$nick_ptn\+\+/) {
       $irc->emit( karma_handler_up => $1, $msg );
+      $msg->handled($name);
     }
 
     if ($text =~ /$nick_ptn\-\-/) {
       $irc->emit( karma_handler_down => $1, $msg );
+      $msg->handled($name);
     }
   });
 
@@ -39,6 +42,7 @@ sub register {
     my ($irc, $msg) = @_;
     if ($msg->text =~ /karma\s+$nick_ptn/) {
       $irc->emit( karma_handler_query => $1, $msg );
+      $msg->handled($name);
     }
   });
 

@@ -23,6 +23,7 @@ sub register {
 
   $irc->on( toastr_direct_message => sub {
     my ($irc, $msg) = @_;
+    return if $msg->handled; # don't reply on a previously handled message
     my $reply = $self->reply;
     my $r = $self->$reply($msg->text, $msg);
     return unless defined $r;
