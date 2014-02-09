@@ -37,8 +37,8 @@ sub get_toast_images {
 }
 
 sub register {
-  my ($self) = @_;
-  $self->irc->on( toastr_toast => sub {
+  my ($self, $irc) = @_;
+  $irc->on( toastr_toast => sub {
     my ($irc, $chan, $text, $msg) = @_;
     $irc->toast->send_toast($chan);
   });
