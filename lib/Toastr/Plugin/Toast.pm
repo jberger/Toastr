@@ -40,16 +40,16 @@ sub register {
   my ($self, $irc) = @_;
   $irc->on( toastr_toast => sub {
     my ($irc, $chan, $text, $msg) = @_;
-    $irc->toast->send_toast($chan);
+    $irc->toast->send_toast($irc, $chan);
   });
   $self->get_toast_images; # populate (once the iolooop starts)
 }
 
 sub send_toast {
-  my ($self, $chan) = @_;
+  my ($self, $irc, $chan) = @_;
   my $prefix = $self->toast_messages->shuffle->[0];
   my $image  = $self->toast_images->shuffle->[0];
-  $self->irc->msg( $chan => "$prefix $image" );
+  $irc->msg( $chan => "$prefix $image" );
 }
 
 1;
