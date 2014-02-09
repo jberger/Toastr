@@ -1,9 +1,6 @@
 package Toastr::Plugin::Dhammapada;
-
 use Mojo::Base 'Toastr::Plugin';
 use Mojo::Collection 'c';
-use Mojo::UserAgent;
-
 has versets => sub { c() };
 
 sub get_versets() {
@@ -20,7 +17,7 @@ sub get_versets() {
 
 sub register {
     my ( $self, $irc ) = @_;
-    $self->get_versets;    # populate (once the iolooop starts)
+    $self->get_versets;
     $irc->on(
         toastr_message => sub {
             my ( $irc, $msg ) = @_;
