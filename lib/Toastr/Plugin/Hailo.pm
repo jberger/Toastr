@@ -14,7 +14,7 @@ sub register {
   my ($self, $irc) = @_;
 
   $irc->on( toastr_privmsg => sub {
-    my ($irc, $chan, $text, $msg) = @_;
+    my ($irc, $chan, $text, $is_pm, $msg) = @_;
     my $learn = $self->learn;
     my $l = $self->$learn($chan, $text, $msg);
     return unless defined $l;
@@ -22,7 +22,7 @@ sub register {
   });
 
   $irc->on( toastr_direct_message => sub {
-    my ($irc, $chan, $text, $msg) = @_;
+    my ($irc, $chan, $text, $is_pm, $msg) = @_;
     my $reply = $self->reply;
     my $r = $self->$reply($chan, $text, $msg);
     return unless defined $r;
