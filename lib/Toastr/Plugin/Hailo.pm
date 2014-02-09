@@ -8,7 +8,7 @@ use Hailo;
 has brain => 'toastr.db';
 has hal   => sub { Hailo->new( brain => shift->brain ) };
 has reply => sub { sub { $_[1] } };
-has learn => sub { sub { $_[1] } };
+has learn => sub { sub { $_[1] unless $_[0] =~ /\?/ } };
 
 sub register {
   my ($self, $irc) = @_;
