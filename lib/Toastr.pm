@@ -48,14 +48,16 @@ sub _privmsg {
     $is_pm = 1;
   }
 
-  $irc->emit( toastr_privmsg => $chan, $text, $is_pm, $msg );
+  my $handled = [];
+
+  $irc->emit( toastr_privmsg => $chan, $text, $is_pm, $handled, $msg );
 
   if ($text =~ s/^\Q$nick\E\S*\s*// or $is_pm) {
-    $irc->emit( toastr_direct_message => $chan, $text, $is_pm, $msg );
+    $irc->emit( toastr_direct_message => $chan, $text, $is_pm, $handled, $msg );
   }
 
   if ($text =~ /toast/) {
-    $irc->emit( toastr_toast => $chan, $text, $msg );
+    $irc->emit( toastr_toast => $chan, $text, $handled, $msg );
   }
 }
 

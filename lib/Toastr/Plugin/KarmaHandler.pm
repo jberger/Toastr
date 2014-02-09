@@ -23,7 +23,7 @@ sub register {
   my $nick_ptn = $irc->nick_ptn;
 
   $irc->on( toastr_privmsg => sub {
-    my ($irc, $chan, $text, $is_pm, $msg) = @_;
+    my ($irc, $chan, $text, $is_pm, $handled, $msg) = @_;
 
     if ($text =~ /$nick_ptn\+\+/) {
       $irc->emit( karma_handler_up => $chan, $1, $msg );
@@ -35,7 +35,7 @@ sub register {
   });
 
   $irc->on( toastr_direct_message => sub {
-    my ($irc, $chan, $text, $is_pm, $msg) = @_;
+    my ($irc, $chan, $text, $is_pm, $handled, $msg) = @_;
     if ($text =~ /karma\s+$nick_ptn/) {
       $irc->emit( karma_handler_query => $chan, $1, $msg );
     }

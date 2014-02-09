@@ -39,7 +39,7 @@ sub get_toast_images {
 sub register {
   my ($self, $irc) = @_;
   $irc->on( toastr_toast => sub {
-    my ($irc, $chan, $text, $msg) = @_;
+    my ($irc, $chan, $text, $handled, $msg) = @_;
     $irc->toast->send_toast($irc, $chan);
   });
   $self->get_toast_images; # populate (once the iolooop starts)
