@@ -3,15 +3,15 @@ use Mojo::Base 'Toastr::Plugin';
 use Mojo::Collection 'c';
 has versets => sub { c() };
 
-sub get_versets() {
+sub get_versets {
     my $self = shift;
     my @data = do {
         local $/ = '';
         <DATA>;
     };
-    my $verses = $self->versets;
+    my $verses  = $self->versets;
     my @versets = grep {/\n(.*)[\d+]/m} @data;
-    my @real = splice( @versets, 4, @versets );
+    my @real    = splice( @versets, 4, @versets );
     push @$verses, @real;
 }
 
@@ -23,18 +23,19 @@ sub register {
             my ( $irc, $msg ) = @_;
             my $text = $msg->text;
             if ( $text =~ /dhammapada/i ) {
-                $irc->emit( print_verset => $msg->chan );
+                $self->dhammapada_verset( $irc, $msg->chan );
+                $msg->handled($self);
             }
         }
     );
-    $irc->on(
-        print_verset => sub {
-            my ( $irc, $chan ) = @_;
-            my $verse = $irc->dhammapada->versets->shuffle->[0];
-            $verse=~tr{\n}{ };
-            $irc->msg( $chan => $verse );
-        }
-    );
+
+}
+
+sub dhammapada_verset {
+    my ( $self, $irc, $chan ) = @_;
+    my $verse = $irc->dhammapada->versets->shuffle->[0];
+    $verse =~ tr{\n}{ };
+    $irc->msg( $chan => $verse );
 }
 
 1;
