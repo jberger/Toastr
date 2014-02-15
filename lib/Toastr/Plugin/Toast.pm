@@ -40,7 +40,7 @@ sub register {
   my ($self, $irc) = @_;
   $irc->on( toastr_message => sub {
     my ($irc, $msg) = @_;
-    $irc->toast->send_toast($irc, $msg->chan) if $msg->text =~ /toast/;
+    $irc->plugin('Toast')->send_toast($irc, $msg->chan) if $msg->text =~ /toast/;
   });
   $self->get_toast_images; # populate (once the iolooop starts)
 }

@@ -2,11 +2,11 @@ package Toastr;
 use Mojo::Base 'Mojo::IRC';
 
 use IRC::Utils ();
-use Mojo::Util 'decamelize';
 use Toastr::Message;
 
 has channels => sub { [ '#toastr' ] };
 has nick_ptn => sub { qr/\b([a-z_\-\[\]\\^{}|`]+)\b/i };
+has plugins  => sub { {} };
 
 sub attach {
   my ($irc) = @_;
@@ -23,17 +23,24 @@ sub attach {
   });
 }
 
-sub msg { shift->write( privmsg => shift, ":@_" ) }
-
-
-sub plugin {
+sub load_plugin {
   my ($self, $name, $args) = @_;
   my $module = "Toastr::Plugin::$name";
   die $@ unless eval "require $module; 1";
   my $plugin = $module->new($args || {});
   $plugin->register($self);
-  $self->attr(decamelize($name) => sub { $plugin });
+  $self->plugins->{$name} = $plugin;
   return $plugin;
+}
+
+sub msg { shift->write( privmsg => shift, ":@_" ) }
+
+sub plugin {
+  my ($self, $name, $args) = @_;
+  if (exists $self->plugins->{$name}) {
+    return $self->plugins->{$name};
+  }
+  return $self->load_plugin($name, $args);
 }
 
 sub start {
@@ -109,7 +116,8 @@ L<Toastr>'s built-in events are prefixed with C<toastr_> and L<Mojo::IRC>'s even
 Plugins are subclasses of L<Toastr::Plugin>.
 A plugin will most likely subscribe to one or more event, then either take some action on that event, or even emit events of its own.
 Plugins namespace must be of the form C<< Toastr::Plugin::<PluginName> >>.
-When loaded the plugin instance will be stored in an attribute named the decamelized plugin name (i.e. C<plugin_name>) using L<Mojo::Util>'s <decamelize> function.
+When loaded, the plugin instance will be stored in a the C<plugins> attribute named, keyed on the plugin name.
+The convenience method L</plugin> may be used to access the plugin and load it if necessary.
 
 =head1 EVENTS
 
@@ -147,6 +155,11 @@ An array reference of channels to connect to.
 A C<qr> regex which is used to extract valid nicks.
 This probably does not need to be changed from its default.
 
+=head2 plugins
+
+Holds instances of loaded plugins, keyed by plugin name.
+This attribute should not be changed manually, use the methods L</plugin> and C</load_plugin>.
+
 =head1 METHODS
 
 L<Toastr> inherits all of the methods from L<Mojo::IRC> and implements the following new ones.
@@ -157,6 +170,16 @@ L<Toastr> inherits all of the methods from L<Mojo::IRC> and implements the follo
 
 This method must be called to subscribe to the necessary events and connect to the server.
 Note that the convenience method L</start> calls this method for you.
+
+=head2 load_plugin
+
+ $toastr->load_plugin('PluginName' => { attr => $val, attr => $val, ... });
+
+Loads plugin C<PluginName> and creates an instance.
+An optional hash reference is used to set attributes on the plugin.
+The instance is stored in the C</plugins> hash.
+
+Note that this may be used to replace the instance if desired.
 
 =head2 msg
 
@@ -169,6 +192,8 @@ The text of the message is all trailing arguments (joined by C<$">).
 
  $toastr->plugin('PluginName' => { attr => $val, attr => $val, ... });
 
-Loads plugin C<PluginName>, adds an attribute C<plugin_name> to C<$toastr> containing the plugin instance.
-An optional hash reference is used to set attributes on the plugin.
+Returns either the cached instance of the plugin or constructs one if necessary using L</load_plugin>.
+If the plugin is already loaded, the constructor hash is ignored.
+
+
 

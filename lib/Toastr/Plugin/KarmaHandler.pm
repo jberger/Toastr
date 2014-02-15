@@ -4,6 +4,8 @@ use Mojo::Base 'Toastr::Plugin';
 
 use DBM::Deep ();
 
+use constant NAME => 'KarmaHandler';
+
 has db => 'karma.db';
 has karma => sub { DBM::Deep->new( shift->db ) };
 
@@ -21,7 +23,6 @@ sub leaderboard {
 sub register {
   my ($self, $irc) = @_;
   my $nick_ptn = $irc->nick_ptn;
-  my $name = 'KarmaHandler';
 
   $irc->on( toastr_message => sub {
     my ($irc, $msg) = @_;
@@ -29,12 +30,12 @@ sub register {
 
     if ($text =~ /$nick_ptn\+\+/) {
       $irc->emit( karma_handler_up => $1, $msg );
-      $msg->handled($name);
+      $msg->handled(NAME);
     }
 
     if ($text =~ /$nick_ptn\-\-/) {
       $irc->emit( karma_handler_down => $1, $msg );
-      $msg->handled($name);
+      $msg->handled(NAME);
     }
   });
 
@@ -42,30 +43,30 @@ sub register {
     my ($irc, $msg) = @_;
     if ($msg->text =~ /karma\s+$nick_ptn/) {
       $irc->emit( karma_handler_query => $1, $msg );
-      $msg->handled($name);
+      $msg->handled(NAME);
     }
   });
 
   $irc->on( karma_handler_up => sub {
     my ($irc, $user, $msg) = @_;
-    $irc->karma_handler->karma->{$user}++;
+    $irc->plugin(NAME)->karma->{$user}++;
   });
 
   $irc->on( karma_handler_down => sub {
     my ($irc, $user, $msg) = @_;
-    $irc->karma_handler->karma->{$user}--;
+    $irc->plugin(NAME)->karma->{$user}--;
   });
 
   $irc->on( karma_handler_query => sub {
     my ($irc, $user, $msg) = @_;
     my $chan = $msg->chan;
-    my $handler = $irc->karma_handler;
+    my $plugin = $irc->plugin(NAME);
     if ($user eq '__leaders__' && $chan !~ /^#/) { # no __leaders__ in channel
-      my $leaders = $handler->leaderboard;
+      my $leaders = $plugin->leaderboard;
       $irc->msg( $chan, $leaders );
       return;
     }
-    my $karma = $handler->karma->{$user} || 'no';
+    my $karma = $plugin->karma->{$user} || 'no';
     $irc->msg( $chan, "$user has $karma karma" );
   });
 }
