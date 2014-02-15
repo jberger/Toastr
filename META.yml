@@ -1,0 +1,38 @@
+---
+abstract: 'The simple pluggable IRC bot'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Toastr
+provides:
+  Toastr:
+    file: lib/Toastr.pm
+    version: 0.01
+  Toastr::Message:
+    file: lib/Toastr/Message.pm
+  Toastr::Plugin:
+    file: lib/Toastr/Plugin.pm
+  Toastr::Plugin::Hailo:
+    file: lib/Toastr/Plugin/Hailo.pm
+  Toastr::Plugin::KarmaHandler:
+    file: lib/Toastr/Plugin/KarmaHandler.pm
+  Toastr::Plugin::Toast:
+    file: lib/Toastr/Plugin/Toast.pm
+requires:
+  IRC::Utils: 0
+  Mojo::IRC: 0
+  Mojolicious: 4.0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/jberger/Toastr/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jberger/Toastr
+version: 0.01

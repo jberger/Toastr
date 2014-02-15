@@ -1,6 +1,9 @@
 package Toastr;
 use Mojo::Base 'Mojo::IRC';
 
+our $VERSION = '0.01';
+$VERSION = eval $VERSION;
+
 use IRC::Utils ();
 use Toastr::Message;
 

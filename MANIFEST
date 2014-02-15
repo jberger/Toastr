@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ex/toastr
+lib/Toastr.pm
+lib/Toastr/Message.pm
+lib/Toastr/Plugin.pm
+lib/Toastr/Plugin/Hailo.pm
+lib/Toastr/Plugin/KarmaHandler.pm
+lib/Toastr/Plugin/Toast.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/plugin.t
