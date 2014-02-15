@@ -3,18 +3,15 @@
 use Mojo::Base -strict;
 use Toastr;
 
-my @chans = (
-  '#toastr'
-);
-
 my $toastr = Toastr->new(
-  nick   => 'toastr',
-  user   => 'toastr bot',
-  server => 'irc.perl.org:6667', 
+  channels => ['#toastr'],
+  nick     => 'toastr',
+  user     => 'toastr bot',
+  server   => 'irc.perl.org:6667', 
 );
 
 $toastr->plugin('KarmaHandler');
 $toastr->plugin('Toast');
 $toastr->plugin('Hailo');
-$toastr->start(\@chans);
+$toastr->start;
 

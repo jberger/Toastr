@@ -5,7 +5,23 @@ use IRC::Utils ();
 use Mojo::Util 'decamelize';
 use Toastr::Message;
 
+has channels => sub { [ '#toastr' ] };
 has nick_ptn => sub { qr/\b([a-z_\-\[\]\\^{}|`]+)\b/i };
+
+sub attach {
+  my ($irc) = @_;
+  $irc->register_default_event_handlers;
+
+  $irc->on( irc_privmsg => \&_privmsg );
+  $irc->on( irc_error => sub { warn $_[1] });
+
+  $irc->connect(sub{
+    my ($irc, $err) = @_;
+    return warn $err if $err;
+    my $chans = $irc->channels;
+    $irc->write( join => $_ ) for @$chans;
+  });
+}
 
 sub msg { shift->write( privmsg => shift, ":@_" ) }
 
@@ -22,18 +38,8 @@ sub plugin {
 }
 
 sub start {
-  my ($irc, $chans) = @_;
-  $irc->register_default_event_handlers;
-
-  $irc->on( irc_privmsg => \&_privmsg );
-  $irc->on( irc_error => sub { warn $_[1] });
-
-  $irc->connect(sub{
-    my ($irc, $err) = @_;
-    return warn $err if $err;
-    $irc->write( join => $_ ) for @$chans;
-  });
-
+  my ($irc) = @_;
+  $irc->attach;
   $irc->ioloop->start;
 }
 
@@ -69,5 +75,11 @@ sub _privmsg {
 
 1;
 
+=head1 NAME
 
+Toastr - The simple pluggable IRC bot
 
+=head1 SYNOPSIS
+
+ use Toastr;
+ my $toastr = Toastr->new
